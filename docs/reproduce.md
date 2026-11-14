@@ -106,7 +106,7 @@ make kernel          # 或 cd kernel && JOBS=12 make build
 
 - `Image`（约 57 MB）、`Image.gz`（约 18 MB）
 - `mt6893-xiaomi-chopin.dtb`（约 281 KB）
-- `modules/lib/modules/<release>/`（1641 个 .ko）
+- `modules/lib/modules/<release>/`（1640 个 .ko）
 
 `<release>` 由 `git describe` 决定。bootstrap 重新应用补丁后 commit hash 会变，
 所以 release 不会等于原始开发机的 `7.3.4-ga9777a8559e0-dirty`，这是正常的。
