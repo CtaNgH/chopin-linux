@@ -17,3 +17,21 @@
 2. 内核补丁从当前 `chopin` 分支重新导出为 20 个（旧 `patches/` 只有 18 个）；
 3. 旧文档中“用户空间已移除”“18 个补丁”等过时描述不再修改，保留原样；
 4. 新文档以 `kernel/`、`debian/`、顶层 `docs/` 为准。
+
+
+## 旧路径 → 新路径
+
+| 旧（`/root/MT6891-Mainline`） | 新（`/root/chopin-linux`） | 说明 |
+| --- | --- | --- |
+| `linux/` | `kernel/linux/` | 不复制，由 `make bootstrap` 从 tarball 重建 |
+| `patches/0001–0018` | `kernel/patches/0001–0020` | 从当前 `chopin` 分支重新导出，多 2 个实机修复 |
+| `scripts/build.sh` | `kernel/scripts/build.sh` | 增加 modules_install / SHA256SUMS / 可复现模式 |
+| `scripts/mkbootimg.py` | `kernel/scripts/mkbootimg.py` | 内容保留 |
+| `scripts/*.ps1` | `scripts/windows/*.ps1` | 路径改为 `D:\chopin-linux` |
+| `debian/` | `debian/` | 独立 Git 仓库；脚本适配三仓库布局 |
+| `docs-kernel.md` | `kernel/docs/kernel.md` | 内容更新到 20 补丁 |
+| `docs-debian.md` | `debian/docs/debian.md` | v2 精简版；v1 全文在 `docs/archive/` |
+| `HANDOFF.md` | `docs/status.md` | 状态更新；旧文在 `docs/archive/` |
+| `out/` | `out/`、`kernel/out/`、`debian/out/` | 不复制，重新构建 |
+
+原始目录 `/root/MT6891-Mainline` **保持原样**，包含完整的旧 Git 历史；本目录只是可发布的整理版。
