@@ -1,0 +1,6 @@
+[submodule "kernel"]
+	path = kernel
+	url = ../chopin-kernel.git
+[submodule "debian"]
+	path = debian
+	url = ../chopin-debian.git
