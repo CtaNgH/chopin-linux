@@ -8,7 +8,7 @@ $ErrorActionPreference = 'Continue'
 $pt = "D:\\Program Files (x86)\\platform-tools"
 
 # start the serial capture first so early boot output is not lost
-$capArgs = @("-NoProfile","-ExecutionPolicy","Bypass","-File","D:\\chopin-linux\\scripts\\capture-serial.ps1","-Out",$Out,"-TimeoutSec","$TimeoutSec","-IdleStopSec","$IdleStopSec")
+$capArgs = @("-NoProfile","-ExecutionPolicy","Bypass","-File","D:\\chopin-linux\\scripts\\windows\\capture-serial.ps1","-Out",$Out,"-TimeoutSec","$TimeoutSec","-IdleStopSec","$IdleStopSec")
 $cap = Start-Process -FilePath "powershell" -PassThru -WindowStyle Hidden -ArgumentList $capArgs
 
 Start-Sleep -Milliseconds 800
