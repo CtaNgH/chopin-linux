@@ -1,0 +1,3 @@
+68aba56c967828b3aeea167f49a5acf0c4114d986245431bf06629fe5f8df2f5  out/boot-chopin-mainline.img
+9461e7c29d6bd63a27ac7f66c752e0de4f43b3158254927bfedff07743d7a7c7  linux/arch/arm64/boot/Image.gz
+864bb487ce1b4a47a2662b81ada0a971243f81f6a1ca258484fb342835df2fb3  linux/arch/arm64/boot/dts/mediatek/mt6893-xiaomi-chopin.dtb

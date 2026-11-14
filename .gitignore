@@ -1,0 +1,10 @@
+
+# 构建产物
+/out/
+/stock/*
+!/stock/README.md
+__pycache__/
+*.pyc
+.DS_Store
+
+# submodule 的工作树由 git 管理，不在这里忽略
