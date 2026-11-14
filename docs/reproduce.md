@@ -137,7 +137,12 @@ cd debian
 sudo ./scripts/build-all.sh
 ```
 
-首次约 30–90 分钟（qemu-user 下 apt 较慢）。可选参数：
+首次约 30–90 分钟（qemu-user 下 apt 较慢）。
+
+> Debian 镜像默认没有按 snapshot 锁定；如果要求逐字节一致的 rootfs，把 `DEBIAN_MIRROR` 指到
+> snapshot.debian.org 的固定时间戳，或在 `versions.env` 里记录当天的 mirror 状态。
+
+可选参数：
 
 | 参数 | 作用 |
 | --- | --- |
