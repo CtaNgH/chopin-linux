@@ -1,15 +1,15 @@
 # 项目状态
 
-> 快照时间：2026-11-15 23:10
+> 快照时间：2026-11-16 04:00
 > 设备：Redmi Note 10 Pro 5G / POCO X3 GT（chopin，M2104K10AC，MT6891Z/CZA，Dimensity 1100）
-> 内核：Linux 7.3.4 + **28 个补丁**；用户空间：Debian 13.7 + GNOME 48.7（Mesa 25.0.7-2+deb13u1）
+> 内核：Linux 7.3.4 + **34 个补丁**；用户空间：Debian 13.7 + GNOME 48.7（Mesa 25.0.7-2+deb13u1）
 
 ## 0. 一句话
 
 **这台手机已经可以当一台日常可用的 Linux 桌面**：GNOME 48.7 以 **Wayland** 运行在
 Mali-G77（panfrost）上，1080×2400@120、缩放 2.5，触摸正常；USB 口同时提供 **CDC-NCM 网卡**
 （usb0 = 192.168.42.2，SSH 免密）和串口控制台；**WiFi 已连 5 GHz**（apt 实测 1.8 MB/s）；
-**扬声器出声**（MT6893/MT6359/CS35L41）；系统时间由 NTP 校准。
+**扬声器出声**（MT6893/MT6359/CS35L41，模拟增益 +20.5 dB）；系统时间由 NTP 校准；**A78 集群从 729 MHz 提到 1.5 GHz**（×2.05）。
 剩下的主要问题是 **P0 偶发 SError**（频率已大降、未根除），以及蓝牙 / 耳机 / 麦克风 / 相机。
 
 ## 1. 里程碑
@@ -30,7 +30,7 @@ Mali-G77（panfrost）上，1080×2400@120、缩放 2.5，触摸正常；USB 口
 | 内核 | ✅ | 进入用户态；release `7.3.4-g5775fb2ac0a1-dirty` |
 | 内存 | ✅ | 实配 6 GiB；静态预留 767 MiB（44 节点），**MemTotal 5.07 GiB**（改前 4.47）；1.5/3 GiB 触碰无 SError |
 | 显示 | ✅ | DRM `card1-DSI-1` connected，1080×2400；vendor `mediatek-drm` |
-| GPU | ✅ | panfrost 识别 `mali-g77 id 0x9080`，`/dev/dri/renderD128`；`bus_clock rate = 349999848` |
+| GPU | ✅ | panfrost 识别 `mali-g77 id 0x9080`，`/dev/dri/renderD128`；核心 650 MHz（chopin-gpu-freq） |
 | 渲染 | ✅ | GLX/EGL/glamor 全部 `Mali-G77 (Panfrost)`；`glxgears` 122 FPS（vsync 120 Hz） |
 | 桌面 | ✅ | gdm3 + GNOME 48.7 **Wayland** 会话；X11 下 mutter 不出帧（见 BRINGUP §12.6） |
 | 触摸 | ✅ | NVT36672c：固件自愈 + lockdown 重试 + Y 轴修复；24 点网格校验无镜像 |
@@ -39,11 +39,14 @@ Mali-G77（panfrost）上，1080×2400@120、缩放 2.5，触摸正常；USB 口
 | USB UDC | ✅ | mtu3 注册 11201000.usb；configfs gadget = CDC-ACM + CDC-NCM，COM11 + usb0 |
 | 串口控制台 | ✅ | `/dev/ttyGS0` + serial-getty；Windows COM11 115200 8N1 |
 | 网络 | ✅ | CDC-NCM usb0 = 192.168.42.2/24（Windows 自动 DHCP，SSH 免密）；WiFi wlan0 连 5 GHz 5240 MHz / 780 Mbit/s |
-| 充电/电量 | ✅ | bq27z561 电量/电压可读；MT6360 充电器 SDP 500 mA，状态 Full/Charging。WiFi 负载下 PC 口供电不足会缓慢放电 |
-| 音频 | 🔶 | MT6893/MT6359/CS35L41 声卡（card 0），扬声器出声；耳机/听筒/麦克风未做 |
+| 充电/电量 | ✅ | bq27z561 电量/电压可读；MT6360 输入 900 mA、充电 1.5 A、终止 100 mA、CV 4.4 V；提前 EOC 由 recharge timer 兜底（实测 +296 mA） |
+| 音频 | 🔶 | MT6893/MT6359/CS35L41 声卡（card 0），扬声器出声；模拟增益 +20.5 dB、左右声道已修正；耳机/听筒/麦克风未做 |
 | 时间 | ✅ | RTC 无电池；systemd-timesyncd 启动后校准（否则 HTTPS 全挂） |
 | 相机/视频 | ❌ | vendor 驱动在树内，未验证 |
-| 稳定性 | ⚠️ | Wayland 桌面连续 3.5 h 无 SError（含 40 min 压力）；P0 未根除 |
+| CPU 频率 | ✅ | A78 729 MHz → **1.5 GHz**（armpll_bl = 1499998780，依赖链基准实测 1497 MHz）；A55 1.773 GHz 不变；电压在 MT6315（SPMI）不可控，1.8 GHz 未验证 |
+| 显示 DMA | ✅ | 34 位 mask（原 32 位）：SWIOTLB 单次上限 256 KiB，>4 GiB 的 scanout 全部映射失败（每启动 50–114 次）；修好后 0 次 |
+| 崩溃 | 🔶 | Chrome/Nautilus 的 Wayland Error 71 已随 DMA mask 修复消失；Nautilus 重命名 + 屏幕键盘仍 100% 崩（Debian #1151025，上游问题） |
+| 稳定性 | ⚠️ | Wayland 桌面连续 3.5 h 无 SError（含 40 min 压力）；P0 未根除。2026-11-16 把随机崩溃定位到显示 DMA mask（已修） |
 
 ## 3. 当前阻塞
 
