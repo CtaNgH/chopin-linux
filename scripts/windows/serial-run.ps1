@@ -46,11 +46,19 @@ try {
     while ((Get-Date) -lt $deadline) {
         $chunk = Read-UntilQuiet $sp 500 1500
         $pre += $chunk
+        # On ttyGS0 this login renders the password prompt as "????????? " (nine
+        # question marks), so matching only "Password:" would hang at the prompt.
+        if ($pre -match "Password:" -or $pre -match "\?{4,}\s*$") {
+            $sp.Write($Pass + [char]13)
+            $pre += Read-UntilQuiet $sp 800 8000
+            $logged = $true
+            break
+        }
         if ($pre -match "login:") {
             $sp.Write($User + [char]13)
             $p2 = Read-UntilQuiet $sp 500 4000
             $pre += $p2
-            if ($p2 -match "Password:") {
+            if ($p2 -match "Password:" -or $p2 -match "\?{4,}") {
                 $sp.Write($Pass + [char]13)
                 $pre += Read-UntilQuiet $sp 800 8000
             }

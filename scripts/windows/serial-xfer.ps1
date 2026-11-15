@@ -38,7 +38,8 @@ try {
     if ($pre -match "login:") {
         $sp.Write("root" + [char]13)
         $p2 = Read-UntilQuiet $sp 600 4000
-        if ($p2 -match "Password:") { $sp.Write("chopin" + [char]13); [void](Read-UntilQuiet $sp 800 8000) }
+        # ttyGS0 renders the password prompt as "????????? " (nine question marks)
+        if ($p2 -match "Password:" -or $p2 -match "\?{4,}") { $sp.Write("chopin" + [char]13); [void](Read-UntilQuiet $sp 800 8000) }
     }
     # make sure we are at a shell prompt
     $sp.Write([char]13)

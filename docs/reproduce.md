@@ -195,14 +195,35 @@ make check
 应看到：
 
 ```
-[ok]   补丁数量 20/20
+[ok]   补丁数量 27/27
 [ok]   kernel/SHA256SUMS
-[ok]   tree = ec46ef62962b0d1eeee482803d0b32ca3b9be698
+[ok]   tree = c660229f0d112c887af942dc98e1ff2d221ef033
 [ok]   chopin_defconfig 一致
 全部检查通过。
 ```
 
 如果 tree 不匹配，说明基线或补丁被改动过；`FORCE=1 make bootstrap` 可重建。
+
+
+### 9.1 网络 / WiFi / 音频（2026-11-15 实机）
+
+    # USB 网络（CDC-NCM）+ SSH
+    ip -br addr show usb0            # 192.168.42.2/24
+    ssh -i out/chopin_key root@192.168.42.2 "uptime"
+
+    # WiFi
+    nmcli device status              # wlan0 connected
+    iw dev wlan0 link                # SSID / 5240 MHz / 780 Mbit/s
+    ping -c1 223.5.5.5
+
+    # 音频
+    cat /proc/asound/cards           # card 0 [mt6893mt6359]
+    pactl list short sinks           # alsa_output.platform-sound.stereo-fallback
+    speaker-test -D hw:0,0 -c 2 -t sine -f 440 -l 1
+
+- WiFi 的固件/NVRAM 由 `chopin-wifi-firmware.service`（debian 仓库）在 sysinit 前安装；
+- 音量必须走软件音量（`api.alsa.soft-mixer=true`），否则系统音量条不生效。
+
 
 ## 10. 清理与重置
 

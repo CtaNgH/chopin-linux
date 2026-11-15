@@ -1,15 +1,16 @@
 # 项目状态
 
-> 快照时间：2026-11-15 13:30
+> 快照时间：2026-11-15 16:00
 > 设备：Redmi Note 10 Pro 5G / POCO X3 GT（chopin，M2104K10AC，MT6891Z/CZA，Dimensity 1100）
-> 内核：Linux 7.3.4 + **25 个补丁**；用户空间：Debian 13.7 + GNOME 48.7（Mesa 25.0.7-2+deb13u1）
+> 内核：Linux 7.3.4 + **27 个补丁**；用户空间：Debian 13.7 + GNOME 48.7（Mesa 25.0.7-2+deb13u1）
 
 ## 0. 一句话
 
-**桌面已经真正跑在 GPU 上**：GNOME 48.7 以 **Wayland** 会话运行在 Mali-G77（panfrost）上，
-1080×2400@120、缩放 2.5，触摸已修复并在实机验证，USB ACM 串口控制台正常。
-剩下的主要问题是 **P0 偶发 SError**（频率已大降、未根除）、充电（MT6360 子设备 -16）、
-网络（RNDIS/WiFi）和音频/相机。
+**这台手机已经可以当一台日常可用的 Linux 桌面**：GNOME 48.7 以 **Wayland** 运行在
+Mali-G77（panfrost）上，1080×2400@120、缩放 2.5，触摸正常；USB 口同时提供 **CDC-NCM 网卡**
+（usb0 = 192.168.42.2，SSH 免密）和串口控制台；**WiFi 已连 5 GHz**（apt 实测 1.8 MB/s）；
+**扬声器出声**（MT6893/MT6359/CS35L41）；系统时间由 NTP 校准。
+剩下的主要问题是 **P0 偶发 SError**（频率已大降、未根除），以及蓝牙 / 耳机 / 麦克风 / 相机。
 
 ## 1. 里程碑
 
@@ -19,7 +20,7 @@
 | M1 首启 | 内核 → initramfs → ext4 → systemd，串口可登录 | ✅ 完成（2026-11-15 00:10） |
 | M2 图形 | KMS + EGL + GPU | ✅ 完成（panfrost + kmsro + G77） |
 | M3 桌面 | GDM + GNOME 会话，可交互 | ✅ 完成（Wayland，触摸可用） |
-| M4 日常 | 网络、WiFi、电源、音频 | 🔶 电量可读；充电/网络/音频未完成 |
+| M4 日常 | 网络、WiFi、电源、音频 | 🔶 USB 网络/SSH、WiFi、扬声器、充电、NTP 已通；蓝牙/耳机/麦克风/相机未完成 |
 
 ## 2. 硬件矩阵
 
@@ -34,11 +35,12 @@
 | 触摸 | ✅ | NVT36672c：固件自愈 + lockdown 重试 + Y 轴修复；24 点网格校验无镜像 |
 | 按键 | ✅ | mtk-pmic-keys / mtk-kpd |
 | 存储 | ✅ | UFS，userdata = `/dev/sdc75`（107 GB） |
-| USB UDC | ✅ | mtu3 注册 11201000.usb；configfs ACM 绑定成功，COM11 |
+| USB UDC | ✅ | mtu3 注册 11201000.usb；configfs gadget = CDC-ACM + CDC-NCM，COM11 + usb0 |
 | 串口控制台 | ✅ | `/dev/ttyGS0` + serial-getty；Windows COM11 115200 8N1 |
-| 网络 | ❌ | 仅 lo；RNDIS 未启用、WiFi 缺 NVRAM |
-| 充电/电量 | ⚠️ | 电量可读（bq27z561，4.3 V/89%）；状态 Not charging、current 0；MT6360 子设备 -16 |
-| 音频 | ❌ | ASoC 驱动在树内，未验证 |
+| 网络 | ✅ | CDC-NCM usb0 = 192.168.42.2/24（Windows 自动 DHCP，SSH 免密）；WiFi wlan0 连 5 GHz 5240 MHz / 780 Mbit/s |
+| 充电/电量 | ✅ | bq27z561 电量/电压可读；MT6360 充电器 SDP 500 mA，状态 Full/Charging。WiFi 负载下 PC 口供电不足会缓慢放电 |
+| 音频 | 🔶 | MT6893/MT6359/CS35L41 声卡（card 0），扬声器出声；耳机/听筒/麦克风未做 |
+| 时间 | ✅ | RTC 无电池；systemd-timesyncd 启动后校准（否则 HTTPS 全挂） |
 | 相机/视频 | ❌ | vendor 驱动在树内，未验证 |
 | 稳定性 | ⚠️ | Wayland 桌面连续 3.5 h 无 SError（含 40 min 压力）；P0 未根除 |
 
@@ -53,21 +55,24 @@
 - 未做：mblock-26/27 之间 237.25 MiB 的 `no-map` 保留对照镜像（0025）已构建、未长期验证；
   若仍复现，下一步用「按页扫内存 + pagemap 记录 PFN」定位坏页。
 
-### 3.2 充电 / MT6360
+### 3.2 充电 / MT6360 ✅ 已可用
 
-- i2c5 上 `subpmic_pmic@1a`、`subpmic_ldo@64` 与 mt6360 MFD 抢地址（-16 EBUSY）；
-- 电量 IC（bq27z561）正常，但充电状态 `Not charging`、`current_now=0`；
-- 影响：长期只能靠电池，且 `otg_vbus` 不完整。
+- MT6360 充电器正常：`POWER_SUPPLY_STATUS=Full/Charging`、`ONLINE=1`、输入限流 500 mA（SDP）；
+- bq27z561 电量计可读（电压/容量/电流）；
+- i2c5 上 `subpmic_pmic@1a`、`subpmic_ldo@64` 仍报 -16 EBUSY——它们是原厂 DTS 的遗留节点，
+  与 MT6360 MFD 抢地址，不影响功能（可后续删掉）。
 
-### 3.3 网络
+### 3.3 网络 ✅ 已可用
 
-- RNDIS/ECM 没加进 USB gadget，设备只有 lo；
-- WiFi 的 `mediatek/mt6893/WIFI` NVRAM 在 nvdata 分区，内核取不到；
-- 影响：只能靠 115200 串口传文件，开发效率受限。
+- **USB 网络**：gadget 用 CDC-NCM（Windows 11 自带 `usbncm.inf` 驱动；RNDIS 在这台机器上没有驱动），
+  设备 usb0 = 192.168.42.2/24 + dnsmasq，Windows 自动 DHCP；SSH 免密；
+- **WiFi**：WLAN-GEN4 内置驱动 + vendor 分区固件 + nvdata 里的 `APCFG/APRDEB/WIFI`，
+  `chopin-wifi-firmware.service` 在 sysinit 前装好；wlan0 连 5 GHz，apt 1.8 MB/s；
+- 遗留：蓝牙（vendor BT 驱动未编入）、耳机/麦克风。
 
 ### 3.4 其他
 
-- 音频、相机、视频编解码未验证；
+- 耳机/听筒/麦克风、蓝牙、相机、视频编解码未验证；
 - X11 下 mutter 不出帧（DRI2 GLX 的 present 路径），桌面只能走 Wayland；
 - 触摸空闲时 IRQ 仍以 ~2/s 触发（驱动打印 "finger leave"），不影响功能。
 
