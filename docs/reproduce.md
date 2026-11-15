@@ -76,8 +76,8 @@ make bootstrap
 1. 下载（或使用本地）官方 `linux-7.3.4.tar.xz`，校验 SHA256
    `b11b6df8295e8e991ff040b71aaa4994a8b55caa23b6b092907f195b5840fd1f`；
 2. 导入 Git，校验基线 tree `2c295deceadadd06d5da1de5fc4f6c84690952a2`；
-3. 依次 `git am` 25 个补丁；
-4. 校验最终 tree **`ec46ef62962b0d1eeee482803d0b32ca3b9be698`**；
+3. 依次 `git am` 28 个补丁；
+4. 校验最终 tree **`bb745e0aecaea34daac9d43e4dc1b973a280b77b`**；
 5. `git gc` 压缩对象。
 
 三种基线来源：

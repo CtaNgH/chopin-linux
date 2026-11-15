@@ -3,13 +3,13 @@
 Redmi Note 10 Pro 5G / POCO X3 GT（**chopin**，M2104K10AC，MT6891Z/CZA，Dimensity 1100）的
 Linux 主线移植：**Linux 7.3.4 内核 + Debian 13.7 + GNOME 48**。
 
-这是一个**可复现**的开源工作区：内核只保留 27 个补丁和版本锚点，用户空间只保留构建配方；
+这是一个**可复现**的开源工作区：内核只保留 28 个补丁和版本锚点，用户空间只保留构建配方；
 源码树、rootfs、镜像、Mesa tarball 都可以从公开来源重新生成，并用 git tree 哈希校验结果。
 
-> **当前状态（2026-11-15 16:00）**：这台手机已经能当日常 Linux 桌面用 ——
+> **当前状态（2026-11-15 23:10）**：这台手机已经能当日常 Linux 桌面用 ——
 > GNOME 48.7 以 Wayland 跑在 Mali-G77（panfrost）上（1080×2400@120、缩放 2.5），触摸正常；
 > USB 口同时提供 **CDC-NCM 网卡**（usb0 192.168.42.2，SSH 免密）和串口控制台；
-> **WiFi 已连 5 GHz**（apt 实测 1.8 MB/s）；**扬声器出声**；NTP 校准系统时间。
+> **WiFi 已连 5 GHz**（apt 实测 1.8 MB/s）；**扬声器出声**；NTP 校准系统时间；**内存 5.07 GiB**（6 GiB 实配，删掉了 848 MiB 的 Android 专用预留，见 [bringup §8](docs/bringup-2026-11-15.md)）。
 > 未完成：P0 偶发 SError（频率已大降）、蓝牙 / 耳机 / 麦克风 / 相机。
 > 详见 [docs/status.md](docs/status.md)，整轮适配记录见 [docs/bringup-2026-11-15.md](docs/bringup-2026-11-15.md)。
 
@@ -24,7 +24,7 @@ Linux 主线移植：**Linux 7.3.4 内核 + Debian 13.7 + GNOME 48**。
 
 | 目录 | 仓库 | 内容 | 体积 |
 | --- | --- | --- | --- |
-| `kernel/` | [chopin-kernel](https://github.com/CtaNgH/chopin-kernel) | 27 个补丁、defconfig、build/bootimg 脚本、内核文档 | ~36 MB |
+| `kernel/` | [chopin-kernel](https://github.com/CtaNgH/chopin-kernel) | 28 个补丁、defconfig、build/bootimg 脚本、内核文档 | ~36 MB |
 | `debian/` | [chopin-debian](https://github.com/CtaNgH/chopin-debian) | Debian rootfs / GNOME / initramfs / 镜像脚本 | ~1 MB |
 | 顶层 | [chopin-linux](https://github.com/CtaNgH/chopin-linux) | README、docs、Makefile、Windows 辅助脚本 | ~1 MB |
 
@@ -75,7 +75,7 @@ git clone https://github.com/CtaNgH/chopin-debian.git debian
 ### 2.2 构建内核
 
 ```bash
-make bootstrap     # 下载/校验 Linux 7.3.4，应用 27 个补丁，校验 tree
+make bootstrap     # 下载/校验 Linux 7.3.4，应用 28 个补丁，校验 tree
 make kernel        # Image.gz + dtbs + modules
 ```
 

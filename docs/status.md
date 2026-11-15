@@ -1,8 +1,8 @@
 # 项目状态
 
-> 快照时间：2026-11-15 16:00
+> 快照时间：2026-11-15 23:10
 > 设备：Redmi Note 10 Pro 5G / POCO X3 GT（chopin，M2104K10AC，MT6891Z/CZA，Dimensity 1100）
-> 内核：Linux 7.3.4 + **27 个补丁**；用户空间：Debian 13.7 + GNOME 48.7（Mesa 25.0.7-2+deb13u1）
+> 内核：Linux 7.3.4 + **28 个补丁**；用户空间：Debian 13.7 + GNOME 48.7（Mesa 25.0.7-2+deb13u1）
 
 ## 0. 一句话
 
@@ -28,6 +28,7 @@ Mali-G77（panfrost）上，1080×2400@120、缩放 2.5，触摸正常；USB 口
 | --- | --- | --- |
 | 引导 | ✅ | LK 从 boot.img 的 DTBO 段 + dtbo 分区取 DT；内核用内嵌 `chopin-board.dtb` 覆盖 |
 | 内核 | ✅ | 进入用户态；release `7.3.4-g5775fb2ac0a1-dirty` |
+| 内存 | ✅ | 实配 6 GiB；静态预留 767 MiB（44 节点），**MemTotal 5.07 GiB**（改前 4.47）；1.5/3 GiB 触碰无 SError |
 | 显示 | ✅ | DRM `card1-DSI-1` connected，1080×2400；vendor `mediatek-drm` |
 | GPU | ✅ | panfrost 识别 `mali-g77 id 0x9080`，`/dev/dri/renderD128`；`bus_clock rate = 349999848` |
 | 渲染 | ✅ | GLX/EGL/glamor 全部 `Mali-G77 (Panfrost)`；`glxgears` 122 FPS（vsync 120 Hz） |
@@ -52,8 +53,9 @@ Mali-G77（panfrost）上，1080×2400@120、缩放 2.5，触摸正常；USB 口
 - 根因方向：板级 DTS 的 reserved-memory 与 LK 真实布局不符，漏掉的 carve-out 被当成空闲 RAM；
 - 已做：按 LK 的 `CHOPIN-LKDT` dump 修正 6 个 mblock 节点（0023），SError 频率从「X11 桌面
   1–3 分钟必崩」降到「3.5 小时不崩」；
-- 未做：mblock-26/27 之间 237.25 MiB 的 `no-map` 保留对照镜像（0025）已构建、未长期验证；
-  若仍复现，下一步用「按页扫内存 + pagemap 记录 PFN」定位坏页。
+- 2026-11-15 晚：实机 memblock 已确认 237.25 MiB 的 md gap 作为 `0xe2000000..0xfc000000` 一整段
+  NOMAP 生效；同时删掉 848 MiB 的 `zone_movable_cma`（0028），MemTotal 4.47 → 5.07 GiB；
+  3 GiB 触碰无 SError，P0 仍需长稳观察。
 
 ### 3.2 充电 / MT6360 ✅ 已可用
 
@@ -88,7 +90,7 @@ Mali-G77（panfrost）上，1080×2400@120、缩放 2.5，触摸正常；USB 口
 
 ```bash
 cd chopin-linux
-make bootstrap          # 内核源码 + 25 个补丁（校验 tree = ec46ef62…）
+make bootstrap          # 内核源码 + 28 个补丁（校验 tree = bb745e0a…）
 make kernel             # Image.gz / dtb / modules
 sudo make debian        # Debian rootfs + GNOME + 镜像
 make artifacts          # 汇总到 out/ + SHA256SUMS
