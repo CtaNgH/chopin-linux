@@ -76,8 +76,8 @@ make bootstrap
 1. 下载（或使用本地）官方 `linux-7.3.4.tar.xz`，校验 SHA256
    `b11b6df8295e8e991ff040b71aaa4994a8b55caa23b6b092907f195b5840fd1f`；
 2. 导入 Git，校验基线 tree `2c295deceadadd06d5da1de5fc4f6c84690952a2`；
-3. 依次 `git am` 20 个补丁；
-4. 校验最终 tree **`5a446a3c45628cd02929769d805d148a29dcb6ce`**；
+3. 依次 `git am` 25 个补丁；
+4. 校验最终 tree **`ec46ef62962b0d1eeee482803d0b32ca3b9be698`**；
 5. `git gc` 压缩对象。
 
 三种基线来源：
@@ -197,7 +197,7 @@ make check
 ```
 [ok]   补丁数量 20/20
 [ok]   kernel/SHA256SUMS
-[ok]   tree = 5a446a3c45628cd02929769d805d148a29dcb6ce
+[ok]   tree = ec46ef62962b0d1eeee482803d0b32ca3b9be698
 [ok]   chopin_defconfig 一致
 全部检查通过。
 ```

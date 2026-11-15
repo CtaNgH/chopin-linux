@@ -22,7 +22,7 @@ MediaTek/Xiaomi 代码。它们来自参考项目 `MT6891-Mainline/linux` 的公
 
 如果要提交到 Linux 上游：
 
-1. 把 20 个补丁拆成可独立评审的小系列；
+1. 把 25 个补丁拆成可独立评审的小系列；
 2. 为每个新 binding 补 `Documentation/devicetree/bindings/`；
 3. 清理厂商代码的 `-Wmissing-prototypes` 等告警和 section mismatch；
 4. 用 `git format-patch` + `git send-email`，不要直接提交 vendor dump。
