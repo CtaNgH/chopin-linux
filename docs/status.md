@@ -1,8 +1,8 @@
 # 项目状态
 
-> 快照时间：2026-11-16 05:05
+> 快照时间：2026-11-16 14:00
 > 设备：Redmi Note 10 Pro 5G / POCO X3 GT（chopin，M2104K10AC，MT6891Z/CZA，Dimensity 1100）
-> 内核：Linux 7.3.4 + **36 个补丁**；用户空间：Debian 13.7 + GNOME 48.7（Mesa 25.0.7-2+deb13u1）
+> 内核：Linux 7.3.4 + **37 个补丁**；用户空间：Debian 13.7 + GNOME 48.7（Mesa 25.0.7-2+deb13u1）
 
 ## 0. 一句话
 
@@ -37,7 +37,7 @@ Mali-G77（panfrost）上，1080×2400@120、缩放 2.5，触摸正常；USB 口
 | 按键 | ✅ | mtk-pmic-keys / mtk-kpd |
 | 存储 | ✅ | UFS，userdata = `/dev/sdc75`（107 GB） |
 | USB UDC | ✅ | mtu3 注册 11201000.usb；configfs gadget = CDC-ACM + CDC-NCM，COM11 + usb0 |
-| USB host | 🔶 | 0036 之后 xhci 开机就有 1 个端口（以前 "root hub has no ports"），切 host 时 MT6360 升压输出 5.05 V；插 U 盘/键盘的实物枚举待验证 |
+| USB host | ✅ | 0036/0037 后 xhci 开机就有 1 个端口；直连 OTG 转接头 + 2.4G 键盘接收器实测：枚举成功、KEY_A/KEY_D/KEY_ENTER 事件到达；带 hub 的转接头仍在 SET_ADDRESS 阶段失败（已知限制） |
 | 串口控制台 | ✅ | `/dev/ttyGS0` + serial-getty；Windows COM11 115200 8N1 |
 | 网络 | ✅ | CDC-NCM usb0 = 192.168.42.2/24（Windows 自动 DHCP，SSH 免密）；WiFi wlan0 连 5 GHz 5240 MHz / 780 Mbit/s |
 | 充电/电量 | ✅ | bq27z561 电量/电压可读；MT6360 输入 900 mA、充电 1.5 A、终止 100 mA、CV 4.4 V；提前 EOC 由 recharge timer 兜底（实测 +296 mA） |
